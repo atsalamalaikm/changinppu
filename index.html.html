@@ -11,7 +11,7 @@ html_code = """
     :root {
       --primary: #6c5ce7;
       --primary-light: #a29bfe;
-      --bg: #f8f9fa; 
+      --bg: #f8f9fa;
       --card-bg: #ffffff;
       --text: #2d3436;
       --text-muted: #636e72;
@@ -157,13 +157,12 @@ html_code = """
       align-items: center;
     }
 
-    /* 캐릭터 이미지 스타일 */
     .character-img-box {
       width: 160px;
       height: 160px;
       margin-bottom: 12px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.2);
       padding: 10px;
       display: flex;
       align-items: center;
@@ -176,7 +175,6 @@ html_code = """
       object-fit: contain;
     }
 
-    /* 유형 별칭을 가장 크게 표시 */
     .result-type-alias {
       font-size: 2.8rem;
       font-weight: 900;
@@ -203,7 +201,6 @@ html_code = """
       border: 1px solid var(--border);
     }
 
-    /* 원래 결핍 유형명은 아주 작게 표시 */
     .result-small-type {
       font-size: 0.75rem;
       color: #95a5a6;
@@ -248,7 +245,7 @@ html_code = """
 
     <div class="result-card">
       <div class="character-img-box">
-        <img id="result-img" src="" alt="캐릭터 이미지">
+        <img id="result-img" src="" alt="캐릭터">
       </div>
       <div class="result-type-alias" id="result-alias"></div>
       <div class="result-character" id="result-character"></div>
@@ -262,86 +259,74 @@ html_code = """
 </div>
 
 <script>
-  // 질문 원본 데이터
   const baseQuestions = [
-    // 애정 결핍
     { type: '애정 결핍', text: '최근 가까운 사람에게 사랑받고 있다는 확신이 든다.' },
     { type: '애정 결핍', text: '주변 사람이 나에게 관심을 보이지 않으면 서운함을 크게 느낀다.' },
     { type: '애정 결핍', text: '가까운 사람이 나에게 관심 표현을 많이 해주기를 바란다.' },
-
-    // 자기 대상 결핍
     { type: '자기 대상 결핍', text: '내 감정을 자세히 설명하지 않아도 알아주는 사람이 곁에 있다.' },
     { type: '자기 대상 결핍', text: '힘든 일이 있을 때 이유를 불문하고 내 편이 되어주는 사람이 곁에 있다.' },
     { type: '자기 대상 결핍', text: '중요한 순간에 나를 이해해 줄 사람이 없는 것처럼 느껴진다.' },
-
-    // 신뢰 결핍
     { type: '신뢰 결핍', text: '친한 사람이라도 나에게 실망을 줄까 봐 걱정될 때가 있다.' },
     { type: '신뢰 결핍', text: '다른 사람의 말을 그대로 믿기보다 숨은 의도를 생각해 보는 편이다.' },
     { type: '신뢰 결핍', text: '누군가와 가까워져도 완전히 마음을 열기는 어렵다.' },
-
-    // 의존성 결핍
     { type: '의존성 결핍', text: '혼자 결정해야 하는 상황이 부담스럽다.' },
     { type: '의존성 결핍', text: '중요한 결정사항에 대해 타인과 의견이 다르더라도 내 선택을 견지할 수 있다.' },
     { type: '의존성 결핍', text: '힘든 일이 생기면 혼자 해결하기보다 누군가에게 의지하고 싶다.' },
-
-    // 소외감 및 사회적 고립
     { type: '소외감 및 사회적 고립', text: '내가 다른 사람들과 잘 어울리지 못한다고 느낄 때가 있다.' },
     { type: '소외감 및 사회적 고립', text: '친구들과 함께 있어도 내가 그들 사이에 완전히 속해 있지 않은 것처럼 느껴질 때가 있다.' },
     { type: '소외감 및 사회적 고립', text: '다른 사람들이 나 없이도 잘 지낼 것 같다는 생각이 들 때가 있다.' },
-
-    // 인정 결핍
     { type: '인정 결핍', text: '다른 사람에게 좋은 평가를 받으면 기분이 크게 좋아진다.' },
     { type: '인정 결핍', text: '다른 사람의 인정 없이는 내가 잘하지 못한 것처럼 느껴진다.' },
     { type: '인정 결핍', text: '다른 사람들이 나를 어떻게 평가하는지 신경 쓰는 편이다.' },
-
-    // 자존감 결핍
     { type: '자존감 결핍', text: '다른 사람과 나를 비교하면서 내가 부족하다고 느낄 때가 있다.' },
     { type: '자존감 결핍', text: '작은 실수를 해도 나 자신을 많이 탓하게 된다.' },
     { type: '자존감 결핍', text: '내가 가진 장점보다 부족한 점이 더 잘 보인다.' }
   ];
 
-  // 각 결핍 유형별 정보 및 첨부해주신 이미지 매핑 (Base64 방식 적용)
+  // 깃허브 계정명(atsalamalaikm)과 저장소명(pictures)을 반영한 기본 URL
+  const GITHUB_BASE_URL = "https://raw.githubusercontent.com/atsalamalaikm/pictures/main/";
+
   const typeInfo = {
     '애정 결핍': {
       alias: '<꼬꼬형>',
       character: '타조',
-      imgSrc: 'KakaoTalk_20261016_140819563.jpg', // 꼬꼬 (두 번째 이미지)
+      imgSrc: GITHUB_BASE_URL + 'KakaoTalk_20261016_140819563.png',
       desc: '사랑과 돌봄, 안정적인 애착을 경험하지 못해 타인의 관심을 과도하게 갈구하거나 반대로 관계를 회피하는 상태입니다.'
     },
     '인정 결핍': {
       alias: '<끼끼형>',
       character: '원숭이',
-      imgSrc: 'KakaoTalk_20261016_140819563_01.jpg', // 끼끼 (세 번째 이미지)
+      imgSrc: GITHUB_BASE_URL + 'KakaoTalk_20261016_140819563_01.png',
       desc: '타인에게 가치 있는 존재로 인정받고 싶은 욕구가 채워지지 않아, 성과나 타인의 시선에 집착하게 되는 상태입니다.'
     },
     '소외감 및 사회적 고립': {
       alias: '<또치형>',
       character: '고슴도치',
-      imgSrc: 'KakaoTalk_20261016_140819563_02.jpg', // 또치 (네 번째 이미지)
+      imgSrc: GITHUB_BASE_URL + 'KakaoTalk_20261016_140819563_02.png',
       desc: '집단이나 타인으로부터 속해 있지 못하다는 느낌을 받으며, 소외되거나 혼자라는 깊은 외로움을 겪는 상태입니다.'
     },
     '자존감 결핍': {
       alias: '<밤또리형>',
       character: '밤톨',
-      imgSrc: 'KakaoTalk_20261016_140819563_03.jpg', // 밤또리 (다섯 번째 이미지)
+      imgSrc: GITHUB_BASE_URL + 'KakaoTalk_20261016_140819563_03.png',
       desc: '스스로를 가치 있는 존재로 여기지 못하고, 내면의 결함이나 수치심 때문에 지속적인 불안을 느끼는 상태입니다.'
     },
     '의존성 결핍': {
       alias: '<삐약형>',
       character: '병아리',
-      imgSrc: 'KakaoTalk_20261016_140819563_04.jpg', // 삐약 (여섯 번째 이미지)
+      imgSrc: GITHUB_BASE_URL + 'KakaoTalk_20261016_140819563_04.png',
       desc: '주체적으로 서지 못하고 타인에게 전적으로 의존하려 하거나, 혼자서는 아무것도 할 수 없다는 무능감에 빠지는 상태입니다.'
     },
     '자기 대상 결핍': {
       alias: '<펭이형>',
       character: '펭귄',
-      imgSrc: 'KakaoTalk_20261016_140819563_05.jpg', // 펭펭 (일곱 번째 이미지)
+      imgSrc: GITHUB_BASE_URL + 'KakaoTalk_20261016_140819563_05.png',
       desc: '자아가 건강한 형태로 성장하는 데 필수적인 외부 대상의 반응이 발달 과정에서 충분히 제공되지 못해 발생한 심리적 결함 상태를 의미함. 주로 사회에서 동떨어진 것 같은 공허감을 느낌.'
     },
     '신뢰 결핍': {
       alias: '<까까형>',
       character: '선인장',
-      imgSrc: 'KakaoTalk_20261016_140819563_06.jpg', // 까까 (첫 번째 이미지)
+      imgSrc: GITHUB_BASE_URL + 'KakaoTalk_20261016_140819563_06.png',
       desc: '배신, 기만, 혹은 가스라이팅과 같은 경험으로 인해 사람이나 세상을 믿지 못하는 상태입니다. 끊임없이 의심하거나 지나치게 경계하며, 관계에서 스스로를 보호하려 벽을 칩니다.'
     }
   };
@@ -454,7 +439,6 @@ html_code = """
     document.getElementById('result-desc').innerText = info.desc;
     document.getElementById('result-small-type').innerText = `(진단 유형: ${maxType})`;
     
-    // 캐릭터 이미지 대입
     document.getElementById('result-img').src = info.imgSrc;
 
     resultContainer.style.display = 'block';
