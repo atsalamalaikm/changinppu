@@ -1,3 +1,4 @@
+```python
 from IPython.display import HTML, display
 
 html_code = """
@@ -152,6 +153,24 @@ html_code = """
       border-radius: 16px;
       margin: 20px 0 16px 0;
       box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* 캐릭터 이미지를 담는 전용 공간 */
+    .result-image-container {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    #result-image {
+      max-width: 150px; /* 이미지 크기 제한 */
+      height: auto;
+      border-radius: 12px;
+      display: none; /* 처음에 숨김 */
     }
 
     /* 유형 별칭을 가장 크게 표시 */
@@ -159,7 +178,7 @@ html_code = """
       font-size: 2.8rem;
       font-weight: 900;
       letter-spacing: -1px;
-      margin-bottom: 6px;
+      margin-bottom: 0;
       text-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
 
@@ -223,8 +242,9 @@ html_code = """
 
   <div class="result-container" id="result-container">
     <div id="result-text-summary" style="font-size: 1.2rem; font-weight: 700; color: #2d3436;"></div>
-    
+
     <div class="result-card">
+      <img id="result-image" src="" alt="캐릭터 이미지"> <!-- 이미지 표시 영역 추가 -->
       <div class="result-type-alias" id="result-alias"></div>
       <div class="result-character" id="result-character"></div>
     </div>
@@ -243,7 +263,7 @@ html_code = """
     { type: '애정 결핍', text: '최근 가까운 사람에게 사랑받고 있다는 확신이 든다.' },
     { type: '애정 결핍', text: '주변 사람이 나에게 관심을 보이지 않으면 서운함을 크게 느낀다.' },
     { type: '애정 결핍', text: '가까운 사람이 나에게 관심 표현을 많이 해주기를 바란다.' },
-    
+
     // 자기 대상 결핍
     { type: '자기 대상 결핍', text: '내 감정을 자세히 설명하지 않아도 알아주는 사람이 곁에 있다.' },
     { type: '자기 대상 결핍', text: '힘든 일이 있을 때 이유를 불문하고 내 편이 되어주는 사람이 곁에 있다.' },
@@ -275,41 +295,49 @@ html_code = """
     { type: '자존감 결핍', text: '내가 가진 장점보다 부족한 점이 더 잘 보인다.' }
   ];
 
-  // 각 결핍 유형별 별칭, 캐릭터, 상세 설명 정의
+  // 각 결핍 유형별 별칭, 캐릭터, 이미지 URL, 상세 설명 정의
+  // 사용자가 제공한 이미지 매핑을 반영하여 image 필드를 추가했습니다.
   const typeInfo = {
     '애정 결핍': {
       alias: '<꼬꼬형>',
       character: '타조',
+      image: 'image_1.png', // 꼬꼬
       desc: '사랑과 돌봄, 안정적인 애착을 경험하지 못해 타인의 관심을 과도하게 갈구하거나 반대로 관계를 회피하는 상태입니다.'
     },
     '인정 결핍': {
       alias: '<끼끼형>',
       character: '원숭이',
+      image: 'image_2.png', // 끼끼
       desc: '타인에게 가치 있는 존재로 인정받고 싶은 욕구가 채워지지 않아, 성과나 타인의 시선에 집착하게 되는 상태입니다.'
     },
     '소외감 및 사회적 고립': {
       alias: '<또치형>',
       character: '고슴도치',
+      image: 'image_3.png', // 또치
       desc: '집단이나 타인으로부터 속해 있지 못하다는 느낌을 받으며, 소외되거나 혼자라는 깊은 외로움을 겪는 상태입니다.'
     },
     '자존감 결핍': {
       alias: '<밤또리형>',
       character: '밤톨',
+      image: 'image_4.png', // 밤또리
       desc: '스스로를 가치 있는 존재로 여기지 못하고, 내면의 결함이나 수치심 때문에 지속적인 불안을 느끼는 상태입니다.'
     },
     '의존성 결핍': {
       alias: '<삐약형>',
       character: '병아리',
+      image: 'image_5.png', // 삐약
       desc: '주체적으로 서지 못하고 타인에게 전적으로 의존하려 하거나, 혼자서는 아무것도 할 수 없다는 무능감에 빠지는 상태입니다.'
     },
     '자기 대상 결핍': {
-      alias: '<펭이형>',
+      alias: '<펭이형>', // 코드의 별칭을 따릅니다. 사용자의 '펭펭'은 image_6.png에 매핑됩니다.
       character: '펭귄',
+      image: 'image_6.png', // 펭펭
       desc: '자아가 건강한 형태로 성장하는 데 필수적인 외부 대상의 반응이 발달 과정에서 충분히 제공되지 못해 발생한 심리적 결함 상태를 의미함. 주로 사회에서 동떨어진 것 같은 공허감을 느낌.'
     },
     '신뢰 결핍': {
       alias: '<까까형>',
       character: '선인장',
+      image: 'image_0.png', // 까까
       desc: '배신, 기만, 혹은 가스라이팅과 같은 경험으로 인해 사람이나 세상을 믿지 못하는 상태입니다. 끊임없이 의심하거나 지나치게 경계하며, 관계에서 스스로를 보호하려 벽을 칩니다.'
     }
   };
@@ -345,7 +373,7 @@ html_code = """
     // 질문 순서 섞기
     questions = shuffle(baseQuestions);
     userAnswers = new Array(questions.length).fill(0);
-    
+
     quizArea.innerHTML = '';
     questions.forEach((q, idx) => {
       const card = document.createElement('div');
@@ -379,7 +407,7 @@ html_code = """
 
   function selectOption(qIdx, score) {
     userAnswers[qIdx] = score;
-    
+
     if (qIdx < questions.length - 1) {
       document.getElementById(`q-${qIdx}`).classList.remove('active');
       currentIdx = qIdx + 1;
@@ -409,7 +437,7 @@ html_code = """
 
     // 최고 점수 유형 산출
     let maxType = '';
-    let maxScore = -1;
+   let maxScore = -1;
 
     for (const [type, score] of Object.entries(scores)) {
       if (score > maxScore) {
@@ -427,6 +455,11 @@ html_code = """
     document.getElementById('result-desc').innerText = info.desc;
     document.getElementById('result-small-type').innerText = `(진단 유형: ${maxType})`;
 
+    // 결과 화면 이미지 반영 (추가됨)
+    const resultImage = document.getElementById('result-image');
+    resultImage.src = info.image;
+    resultImage.style.display = 'block'; // 이미지가 로드되면 표시
+
     resultContainer.style.display = 'block';
   }
 
@@ -435,7 +468,7 @@ html_code = """
     resultContainer.style.display = 'none';
     quizArea.style.display = 'block';
     progressContainer.style.display = 'block';
-    
+
     // 다시 시작 시 질문 순서 새로 섞기
     initQuiz();
   }
@@ -448,3 +481,5 @@ html_code = """
 """
 
 display(HTML(html_code))
+
+```
