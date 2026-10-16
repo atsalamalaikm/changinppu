@@ -157,25 +157,26 @@ html_code = """
       align-items: center;
     }
 
-    .result-image-wrapper {
-      width: 140px;
-      height: 140px;
-      background: rgba(255, 255, 255, 0.2);
+    /* 캐릭터 이미지 스타일 */
+    .character-img-box {
+      width: 160px;
+      height: 160px;
+      margin-bottom: 12px;
       border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 16px;
-      overflow: hidden;
-      padding: 10px;
     }
 
-    .result-image-wrapper img {
-      width: 100%;
-      height: 100%;
+    .character-img-box img {
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
     }
 
+    /* 유형 별칭을 가장 크게 표시 */
     .result-type-alias {
       font-size: 2.8rem;
       font-weight: 900;
@@ -202,6 +203,7 @@ html_code = """
       border: 1px solid var(--border);
     }
 
+    /* 원래 결핍 유형명은 아주 작게 표시 */
     .result-small-type {
       font-size: 0.75rem;
       color: #95a5a6;
@@ -245,8 +247,8 @@ html_code = """
     <div id="result-text-summary" style="font-size: 1.2rem; font-weight: 700; color: #2d3436;"></div>
 
     <div class="result-card">
-      <div class="result-image-wrapper">
-        <img id="result-img" src="" alt="캐릭터">
+      <div class="character-img-box">
+        <img id="result-img" src="" alt="캐릭터 이미지">
       </div>
       <div class="result-type-alias" id="result-alias"></div>
       <div class="result-character" id="result-character"></div>
@@ -298,49 +300,48 @@ html_code = """
     { type: '자존감 결핍', text: '내가 가진 장점보다 부족한 점이 더 잘 보인다.' }
   ];
 
-  // 이미지 경로 지정 (파일명을 로컬 PC 혹은 웹 서버의 실제 파일 이름/경로로 바꿔주세요)
-  // 예: 'images/kkakka.png' 또는 'https://.../kkakka.jpg'
+  // 각 결핍 유형별 정보 및 첨부해주신 이미지 매핑 (Base64 방식 적용)
   const typeInfo = {
     '애정 결핍': {
       alias: '<꼬꼬형>',
       character: '타조',
-      imageName: 'KakaoTalk_20261016_140819563.jpg', // 꼬꼬
+      imgSrc: 'KakaoTalk_20261016_140819563.jpg', // 꼬꼬 (두 번째 이미지)
       desc: '사랑과 돌봄, 안정적인 애착을 경험하지 못해 타인의 관심을 과도하게 갈구하거나 반대로 관계를 회피하는 상태입니다.'
     },
     '인정 결핍': {
       alias: '<끼끼형>',
       character: '원숭이',
-      imageName: 'KakaoTalk_20261016_140819563_01.jpg', // 끼끼
+      imgSrc: 'KakaoTalk_20261016_140819563_01.jpg', // 끼끼 (세 번째 이미지)
       desc: '타인에게 가치 있는 존재로 인정받고 싶은 욕구가 채워지지 않아, 성과나 타인의 시선에 집착하게 되는 상태입니다.'
     },
     '소외감 및 사회적 고립': {
       alias: '<또치형>',
       character: '고슴도치',
-      imageName: 'KakaoTalk_20261016_140819563_02.jpg', // 또치
+      imgSrc: 'KakaoTalk_20261016_140819563_02.jpg', // 또치 (네 번째 이미지)
       desc: '집단이나 타인으로부터 속해 있지 못하다는 느낌을 받으며, 소외되거나 혼자라는 깊은 외로움을 겪는 상태입니다.'
     },
     '자존감 결핍': {
       alias: '<밤또리형>',
       character: '밤톨',
-      imageName: 'KakaoTalk_20261016_140819563_03.jpg', // 밤또리
+      imgSrc: 'KakaoTalk_20261016_140819563_03.jpg', // 밤또리 (다섯 번째 이미지)
       desc: '스스로를 가치 있는 존재로 여기지 못하고, 내면의 결함이나 수치심 때문에 지속적인 불안을 느끼는 상태입니다.'
     },
     '의존성 결핍': {
       alias: '<삐약형>',
       character: '병아리',
-      imageName: 'KakaoTalk_20261016_140819563_04.jpg', // 삐약
+      imgSrc: 'KakaoTalk_20261016_140819563_04.jpg', // 삐약 (여섯 번째 이미지)
       desc: '주체적으로 서지 못하고 타인에게 전적으로 의존하려 하거나, 혼자서는 아무것도 할 수 없다는 무능감에 빠지는 상태입니다.'
     },
     '자기 대상 결핍': {
       alias: '<펭이형>',
       character: '펭귄',
-      imageName: 'KakaoTalk_20261016_140819563_05.jpg', // 펭펭
+      imgSrc: 'KakaoTalk_20261016_140819563_05.jpg', // 펭펭 (일곱 번째 이미지)
       desc: '자아가 건강한 형태로 성장하는 데 필수적인 외부 대상의 반응이 발달 과정에서 충분히 제공되지 못해 발생한 심리적 결함 상태를 의미함. 주로 사회에서 동떨어진 것 같은 공허감을 느낌.'
     },
     '신뢰 결핍': {
       alias: '<까까형>',
       character: '선인장',
-      imageName: 'KakaoTalk_20261016_140819563_06.jpg', // 까까
+      imgSrc: 'KakaoTalk_20261016_140819563_06.jpg', // 까까 (첫 번째 이미지)
       desc: '배신, 기만, 혹은 가스라이팅과 같은 경험으로 인해 사람이나 세상을 믿지 못하는 상태입니다. 끊임없이 의심하거나 지나치게 경계하며, 관계에서 스스로를 보호하려 벽을 칩니다.'
     }
   };
@@ -453,14 +454,8 @@ html_code = """
     document.getElementById('result-desc').innerText = info.desc;
     document.getElementById('result-small-type').innerText = `(진단 유형: ${maxType})`;
     
-    // 이미지 파일 세팅
-    const imgEl = document.getElementById('result-img');
-    imgEl.src = info.imageName;
-    
-    // 만약 이미지를 불러올 수 없는 환경이면 박스 자체를 숨겨서 404 깨짐 현상을 방지
-    imgEl.onerror = function() {
-      this.style.display = 'none';
-    };
+    // 캐릭터 이미지 대입
+    document.getElementById('result-img').src = info.imgSrc;
 
     resultContainer.style.display = 'block';
   }
