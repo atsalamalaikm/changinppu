@@ -205,15 +205,23 @@
       align-items: center;
     }
 
-    /* 캐릭터 이미지 스타일 */
-    .result-img {
-      width: 200px;
-      height: 200px;
-      object-fit: contain;
+    .img-box {
+      width: 220px;
+      height: 220px;
       margin-bottom: 16px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 8px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    .result-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
     }
 
     .result-type-alias {
@@ -307,8 +315,9 @@
     <div id="result-text-summary" style="font-size: 1.2rem; font-weight: 700; color: #ffffff;"></div>
     
     <div class="result-card">
-      <!-- 캐릭터 이미지 -->
-      <img id="result-img" class="result-img" src="" alt="캐릭터 이미지">
+      <div class="img-box">
+        <img id="result-img" class="result-img" src="" alt="캐릭터 이미지">
+      </div>
       <div class="result-type-alias" id="result-alias"></div>
       <div class="result-character" id="result-character"></div>
     </div>
@@ -325,86 +334,78 @@
 </div>
 
 <script>
-  // 질문 데이터
   const baseQuestions = [
-    // 애정 결핍
     { type: '애정 결핍', text: "'나 사랑해?'라고 물었을 때 '그렇다'라고 답할 사람이 주변에 2명 이상 있다." },
     { type: '애정 결핍', text: '내 감정을 자세히 설명하지 않아도 알아주는 사람이 곁에 있다.' },
     { type: '애정 결핍', text: '무뚝뚝한 사람보다 관심이나 애정 표현을 많이 해주기를 바라는 편이다.' },
     
-    // 자기 대상 결핍
     { type: '자기 대상 결핍', text: '힘든 일이 있을 때 이유를 불문하고 내 편이 되어주는 사람은 현실적으로 찾기 힘들다고 생각한다.' },
     { type: '자기 대상 결핍', text: "2학기 중간고사를 본 후 '그래도 잘했어', '수고했어'와 비슷한 맥락의 말을 타인에게 듣지 못했다." },
     { type: '자기 대상 결핍', text: '내가 꾸미는 이유는 타인의 시선이 신경쓰이기 때문이다 (또는 내가 꾸미지 않는 이유는 타인의 시선을 신경쓰지 않기 때문이다).' },
 
-    // 신뢰 결핍
     { type: '신뢰 결핍', text: '다른 사람의 말을 그대로 믿기보다 숨은 의도를 생각해 보는 편이다.' },
     { type: '신뢰 결핍', text: '친한 사람이라도 내가 실망시킨다면 나를 떠날 것 같다.' },
     { type: '신뢰 결핍', text: '누군가와 가까워져도 완전히 마음을 여는 것은 위험하다.' },
 
-    // 의존성 결핍
     { type: '의존성 결핍', text: '혼자 결정해야 하는 상황이 부담스럽다.' },
     { type: '의존성 결핍', text: "수행평가 보고서를 다 쓴 다음 '제출 버튼'을 누르지 못해 한참 망설인 적이 3회 이상 있다." },
     { type: '의존성 결핍', text: '나는 평생 엄마아빠와 함께 살고 싶다.' },
 
-    // 소외감 및 사회적 고립
     { type: '소외감 및 사회적 고립', text: "최근 일주일 내에 친구와 함께 있지만 '외롭다'고 느낀 경험이 3회 이상 있다." },
     { type: '소외감 및 사회적 고립', text: '다른 사람들이 내가 없어도 잘 지낼 것 같다는 생각이 들곤 한다.' },
     { type: '소외감 및 사회적 고립', text: '나는 친구와 노는 것보다 집에서 인터넷 등을 하며 혼자 노는 것이 더 편하다.' },
 
-    // 인정 결핍
     { type: '인정 결핍', text: '중요한 순간에 나를 이해해 줄 사람이 없는 것처럼 느껴진다.' },
     { type: '인정 결핍', text: '중요한 결정사항에 대해 타인과 의견이 다르면, 웬만해서는 내가 의견을 굽히는 편이다.' },
     { type: '인정 결핍', text: '목표를 달성하지 못했더라도 다른 사람이 인정해주면 나는 만족할 수 있다.' },
 
-    // 자존감 결핍
     { type: '자존감 결핍', text: '나는 장점보다 단점이 더 많다.' },
     { type: '자존감 결핍', text: '다른 사람과 나를 비교하면서 내가 부족하다고 느낄 때가 일주일에 세 번 이상 된다.' },
     { type: '자존감 결핍', text: '실수를 하면 나 자신을 많이 탓하는 편이다.' }
   ];
 
-  // 정확한 이미지 파일명으로 업데이트된 매핑 객체
+  // 이미지 후보명(563, 562, 괄호 형태 등)을 다중 지원하도록 작성
   const typeInfo = {
     '애정 결핍': {
       alias: '<꼬꼬형>',
-      character: '타조 (가슴의 깨진 하트, 스카프와 장화)',
-      img: 'KakaoTalk_20261016_140819563.png',
+      character: '타조',
+      imgs: ['KakaoTalk_20261016_140819563.png', 'KakaoTalk_20261016_140819562.png'],
       desc: '사랑과 돌봄, 안정적인 애착을 경험하지 못해 타인의 관심을 과도하게 갈구하거나 반대로 관계를 회피하는 상태입니다.'
     },
     '인정 결핍': {
       alias: '<끼끼형>',
-      character: '원숭이 (머리 왕관, 몸의 별 스티커)',
-      img: 'KakaoTalk_20261016_140819563_01.png',
+      character: '원숭이',
+      imgs: ['KakaoTalk_20261016_140819563_01.png', 'KakaoTalk_20261016_140819562 (1).png'],
       desc: '타인에게 가치 있는 존재로 인정받고 싶은 욕구가 채워지지 않아, 성과나 타인의 시선에 집착하게 되는 상태입니다.'
     },
     '소외감 및 사회적 고립': {
       alias: '<또치형>',
-      character: '고슴도치 (커다란 모자, 감은 눈)',
-      img: 'KakaoTalk_20261016_140819563_02.png',
+      character: '고슴도치',
+      imgs: ['KakaoTalk_20261016_140819563_02.png', 'KakaoTalk_20261016_140819562 (2).png'],
       desc: '집단이나 타인으로부터 속해 있지 못하다는 느낌을 받으며, 소외되거나 혼자라는 깊은 외로움을 겪는 상태입니다.'
     },
     '자존감 결핍': {
       alias: '<밤또리형>',
-      character: '밤톨 (공허한 눈, 아이 같은 표정)',
-      img: 'KakaoTalk_20261016_140819563_03.png',
+      character: '밤톨',
+      imgs: ['KakaoTalk_20261016_140819563_03.png', 'KakaoTalk_20261016_140819562 (3).png'],
       desc: '스스로를 가치 있는 존재로 여기지 못하고, 내면의 결함이나 수치심 때문에 지속적인 불안을 느끼는 상태입니다.'
     },
     '의존성 결핍': {
       alias: '<삐약형>',
-      character: '병아리 (둥근 몸, 타인을 향하는 꽁지머리)',
-      img: 'KakaoTalk_20261016_140819563_04.png',
+      character: '병아리',
+      imgs: ['KakaoTalk_20261016_140819563_04.png', 'KakaoTalk_20261016_140819562 (4).png'],
       desc: '주체적으로 서지 못하고 타인에게 전적으로 의존하려 하거나, 혼자서는 아무것도 할 수 없다는 무능감에 빠지는 상태입니다.'
     },
     '자기 대상 결핍': {
       alias: '<펭이형>',
-      character: '펭귄 (짝짝이 눈, 멜빵)',
-      img: 'KakaoTalk_20261016_140819563_05.png',
+      character: '펭귄',
+      imgs: ['KakaoTalk_20261016_140819563_05.png', 'KakaoTalk_20261016_140819562 (5).png'],
       desc: '자아가 건강한 형태로 성장하는 데 필수적인 외부 대상의 반응이 발달 과정에서 충분히 제공되지 못해 발생한 심리적 결함 상태를 의미함. 주로 사회에서 동떨어진 것 같은 공허감을 느낌.'
     },
     '신뢰 결핍': {
       alias: '<까까형>',
-      character: '선인장 (상처 밴드, 자물쇠 화분)',
-      img: 'KakaoTalk_20261016_140819563_06.png',
+      character: '선인장',
+      imgs: ['KakaoTalk_20261016_140819563_06.png', 'KakaoTalk_20261016_140819562 (6).png'],
       desc: '배신, 기만, 혹은 가스라이팅과 같은 경험으로 인해 사람이나 세상을 믿지 못하는 상태입니다. 끊임없이 의심하거나 지나치게 경계하며, 관계에서 스스로를 보호하려 벽을 칩니다.'
     }
   };
@@ -502,6 +503,24 @@
     updateProgress();
   }
 
+  // 첫 번째 파일명 시도 후 실패 시 두 번째 파일명으로 자동 대처하는 로직
+  function loadImageWithFallback(imgElement, candidateImgs) {
+    let imgIdx = 0;
+    
+    function tryNext() {
+      if (imgIdx < candidateImgs.length) {
+        imgElement.src = candidateImgs[imgIdx];
+        imgIdx++;
+      }
+    }
+
+    imgElement.onerror = function() {
+      tryNext();
+    };
+
+    tryNext();
+  }
+
   function showResult() {
     quizArea.style.display = 'none';
     progressContainer.style.display = 'none';
@@ -527,9 +546,11 @@
     const maxType = maxTypes[Math.floor(Math.random() * maxTypes.length)];
     const info = typeInfo[maxType];
 
-    // 결과 정보 및 이미지 경로 세팅
     document.getElementById('result-text-summary').innerText = `당신은 ${info.alias} 입니다.`;
-    document.getElementById('result-img').src = info.img;
+    
+    const imgElement = document.getElementById('result-img');
+    loadImageWithFallback(imgElement, info.imgs);
+
     document.getElementById('result-alias').innerText = info.alias;
     document.getElementById('result-character').innerText = `캐릭터: ${info.character}`;
     document.getElementById('result-desc').innerText = info.desc;
