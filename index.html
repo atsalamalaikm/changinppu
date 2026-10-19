@@ -364,7 +364,7 @@
     { type: '자존감 결핍', text: '실수를 하면 나 자신을 많이 탓하는 편이다.' }
   ];
 
-  // 이미지 후보명(563, 562, 괄호 형태 등)을 다중 지원하도록 작성
+  // 괄호 부분 삭제 후 명료한 이름으로 세팅
   const typeInfo = {
     '애정 결핍': {
       alias: '<꼬꼬형>',
@@ -503,7 +503,6 @@
     updateProgress();
   }
 
-  // 첫 번째 파일명 시도 후 실패 시 두 번째 파일명으로 자동 대처하는 로직
   function loadImageWithFallback(imgElement, candidateImgs) {
     let imgIdx = 0;
     
